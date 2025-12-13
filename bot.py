@@ -1,28 +1,14 @@
+from aiogram import Bot, Dispatcher, types
+from aiogram.utils import executor
 import os
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = os.environ.get("BOT_TOKEN")
+bot = Bot(token=TOKEN)
+dp = Dispatcher(bot)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "🚕 Taxi botga xush kelibsiz!\n\n"
-        "🚗 Qayerdan → Qayerga\n"
-        "🕒 Vaqt\n"
-        "📞 Telefon\n\n"
-        "Shu formatda yozing."
-    )
+@dp.message_handler()
+async def echo(message: types.Message):
+    await message.reply(f"Received: {message.text}")
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
-    await update.message.reply_text(
-        "✅ Buyurtma qabul qilindi!\n\n"
-        f"📌 Buyurtma:\n{text}\n\n"
-        "Haydovchilar ko‘radi."
-    )
-
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-app.run_polling()
+if __name__ == "__main__":
+    executor.start_polling(dp)
